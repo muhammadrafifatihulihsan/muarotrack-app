@@ -1,0 +1,66 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# environment (contains API keys, tokens)
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# app-example scaffold
+app-example/
+
+# generated native folders
+/ios
+/android
+
+# test coverage
+coverage/
+
+# AI assistant files and folders (not app code)
+AGENTS.md
+CLAUDE.md
+.claude/
+.git_disabled/
+
+# implementation plan docs (not app code)
+implementation_plan.md
+
+# editor settings
+.vscode/
+.idea/
+
+# misc
+*.log
+temp/
+tmp/
