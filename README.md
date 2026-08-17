@@ -1,50 +1,101 @@
-# Welcome to your Expo app 👋
+# MuaroTrack — Aplikasi Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> **GEMASTIK XIX (2026) — Cabang Kompetisi VIII: Pengembangan Perangkat Lunak (Software Development)**
+> Tim: **alamak dahpulkam pulak** · ID Tim: **260010321952850** · Universitas Negeri Padang
 
-## Get started
+**MuaroTrack: Rekomendasi Zona Tangkap dan Prediksi Kebutuhan Bahan Bakar Berbasis Parameter Oseanografi Lokal bagi Nelayan Tradisional Pesisir Padang Pascabencana**
 
-1. Install dependencies
+Aplikasi mobile **offline-first** bagi nelayan tradisional di kawasan pesisir Padang yang menggabungkan parameter oseanografi standar (SST dan klorofil-a, mengacu PPDPI BROL–KKP) dengan faktor lokal pascabencana (turbiditas/NDTI, batimetri, fase bulan, jarak ke muara terdampak), serta menyediakan prediksi kebutuhan BBM yang dipersonalisasi per profil kapal. Fungsi inti aplikasi tetap andal digunakan di tengah laut tanpa koneksi internet.
 
-   ```bash
-   npm install
-   ```
+## Fitur Utama
 
-2. Start the app
+- **Registrasi profil kapal (onboarding)** — kalibrasi konsumsi BBM per kilometer dari data pengguna (nama, BBM per trip, jarak tempuh biasa)
+- **Rekomendasi zona tangkap** — skor gabungan 6 faktor (SST 20%, klorofil-a 15%, turbiditas 25%, batimetri 15%, fase bulan 10%, jarak muara 15%) + bonus komunitas 0,10
+- **Prediksi kebutuhan BBM personal** — Haversine × konsumsi per km × faktor pulang-pergi
+- **Navigasi & posisi kapal** — GPS realtime, rotasi marker, heading 8 mata angin (offline)
+- **Kompas & solunar** — panduan arah + aktivitas ikan berbasis fase bulan (suncalc, offline)
+- **Kondisi laut** — gelombang, cuaca, pasang surut dari cache sinkronisasi terakhir
+- **Laporan tangkapan** — input teks atau suara (faster-whisper → DeepSeek API), antrean sinkronisasi offline
+- **Titik favorit** — simpan lokasi tangkap dengan label
+- **SOS darurat** — antrean sinyal offline, push notification ke nelayan sekitar (radius 10 km)
+- **Sinkronisasi** — unduh zona/tile peta, kirim data tertunda (batch, retry 5×, jeda 10 detik)
 
-   ```bash
-   npx expo start
-   ```
+## Tech Stack
 
-In the output, you'll find options to open the app in a
+| Lapisan | Teknologi |
+|---|---|
+| Framework | Expo SDK 54, React Native 0.81.5, React 19.1, TypeScript 5.9 |
+| Routing | expo-router 6.0, React Navigation bottom-tabs 7.4 |
+| Peta | MapLibre React Native 10.0 (tile offline: OSM/Esri/CARTO/OpenSeaMap) |
+| Cache & sensor | expo-sqlite 16.0, expo-location 19.0, expo-av 16.0, expo-notifications 0.32 |
+| State & data | Zustand 5.0, TanStack Query 5.60, AsyncStorage 2.0 |
+| Utilitas | suncalc 1.9, NetInfo 11.4 |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Struktur Proyek
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/
+├── app/                    # Routing berbasis berkas (expo-router)
+│   ├── _layout.tsx         # Lapisan akar (font, QueryClient, sinkronisasi)
+│   ├── index.tsx           # Gerbang pemeriksaan status onboarding
+│   ├── onboarding.tsx      # Registrasi profil kapal
+│   └── (tabs)/             # Beranda, Laporan, Riwayat, Profil
+├── src/
+│   ├── components/         # BottomSheet, CustomAlert
+│   ├── constants/          # config, mapStyles, theme
+│   ├── features/           # beranda, kompas, kondisi-laut, peta, solunar, sos
+│   ├── lib/                # haversine, bearing, moon, solunar, prediksiBbm, sync, dll.
+│   ├── stores/             # nelayanStore, petaStore, syncStore (Zustand)
+│   └── types/              # Tipe API
+├── assets/images/          # Ikon & splash
+├── .env.example            # Contoh konfigurasi environment
+├── app.json                # Konfigurasi Expo (package: com.muarotrack.app)
+└── eas.json                # Profil build EAS (preview → APK)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Prasyarat
 
-## Learn more
+- Node.js 20+ (disarankan LTS)
+- Android Studio / emulator Android, atau perangkat Android dengan Expo Go
+- Backend server MuaroTrack (lihat [muarotrack-backend](https://github.com/muhammadrafifatihulihsan/muarotrack-backend)) — atau gunakan APK yang sudah terhubung ke server yang di-host
 
-To learn more about developing your project with Expo, look at the following resources:
+## Menjalankan (Development)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm install
+cp .env.example .env        # lalu atur EXPO_PUBLIC_API_BASE_URL
+npx expo start
+```
 
-## Join the community
+Konfigurasi `EXPO_PUBLIC_API_BASE_URL`:
 
-Join our community of developers creating universal apps.
+| Lingkungan | Nilai |
+|---|---|
+| Emulator Android | `http://10.0.2.2:8000` |
+| Perangkat fisik | `http://<alamat-IP-komputer>:8000` |
+| Produksi | Alamat server yang telah di-host |
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Build APK
+
+```bash
+# APK distribusi internal (EAS Build)
+npx eas build -p android --profile preview
+
+# Atau jalankan langsung ke emulator/device
+npx expo run:android
+```
+
+## Lisensi
+
+- Lisensi kode sumber aplikasi: **MIT License** — lihat berkas [`LICENSE`](LICENSE)
+- Daftar lisensi komponen pihak ketiga: [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md)
+
+## Tautan Terkait
+
+- Backend server: https://github.com/muhammadrafifatihulihsan/muarotrack-backend
+- APK Android: https://drive.google.com/drive/folders/1hroWpdvEJpyKpmBJho8lzwqTEA6m6NHC
+- Video demo: https://youtu.be/_h3ZziaByIQ
+
+---
+
+*Dikembangkan untuk Pagelaran Mahasiswa Nasional Bidang TIK (GEMASTIK) XIX Tahun 2026 — Universitas Negeri Padang.*
